@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>锐思投研 · A股研究工作台</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="hd-top">
+    <div class="logo">锐</div>
+    <div class="brand">锐思投研 <small>RUISI RESEARCH DESK · A股</small></div>
+    <div class="hd-meta">
+      <span class="pill snap" id="p-asof" title="数据为最近一次同步的快照，两次同步之间不会变化"><i></i>加载中…</span>
+      <span class="pill" id="p-source">数据源 NeoData</span>
+      <span class="pill" id="p-sync">同步状态 —</span>
+      <button class="btn-refresh" id="btn-reload" title="重新读取本地库（不重新拉取上游数据）">重新读取</button>
+    </div>
+  </div>
+  <nav id="nav">
+    <button data-tab="dash" class="on">市场总览</button>
+    <button data-tab="stock">个股深度研究</button>
+    <button data-tab="screen">选股器</button>
+    <button data-tab="folio">持仓与自选</button>
+    <button data-tab="lineage">数据血缘</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ============ 市场总览 ============ -->
+<section class="panel on" id="panel-dash">
+  <div class="sec-h">市场总览<span class="sec-sub" id="dash-asof"></span></div>
+
+  <div class="cards" id="idx-cards"></div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-h">两市成交 <span class="hint" id="breadth-hint"></span></div>
+      <div id="breadth-box"></div>
+    </div>
+    <div class="card">
+      <div class="card-h">行业板块一览 <span class="hint">接口仅返回部分板块，非全部行业</span></div>
+      <div id="sector-box"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">板块涨跌幅与主力资金 <span class="hint">柱：涨跌幅　点：主力净流入</span></div>
+    <div class="chart" id="c-sector" style="height:300px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">全池个股行情 <span class="hint" id="stockpool-hint"></span></div>
+    <div class="tbl-wrap"><table id="pool-tbl"></table></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">缺失数据说明</div>
+    <div class="note" id="gap-note"></div>
+  </div>
+</section>
+
+<!-- ============ 个股深度研究 ============ -->
+<section class="panel" id="panel-stock">
+  <div class="sec-h">个股深度研究<span class="sec-sub" id="stock-asof"></span></div>
+  <div class="chips" id="stock-chips"></div>
+  <div id="stock-body"></div>
+</section>
+
+<!-- ============ 选股器 ============ -->
+<section class="panel" id="panel-screen">
+  <div class="sec-h">选股器<span class="sec-sub">条件在本地库上执行，不调用外部接口</span></div>
+
+  <div class="card">
+    <div class="card-h">筛选条件</div>
+    <div class="filters" id="filters"></div>
+    <div class="filter-actions">
+      <button class="btn primary" id="btn-screen">执行筛选</button>
+      <button class="btn" id="btn-reset">重置</button>
+      <span class="hint" id="coverage-hint"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">结果 <span class="hint" id="screen-count"></span></div>
+    <div class="tbl-wrap"><table id="screen-tbl"></table></div>
+  </div>
+</section>
+
+<!-- ============ 持仓与自选 ============ -->
+<section class="panel" id="panel-folio">
+  <div class="sec-h">持仓与自选<span class="sec-sub">你录入的数据保存在本机数据库，不会上传</span></div>
+
+  <div class="card">
+    <div class="card-h">新增持仓 / 自选</div>
+    <div class="form-row">
+      <label>代码<input id="i-code" placeholder="600519.SH"></label>
+      <label>名称<input id="i-name" placeholder="可留空"></label>
+      <label>持股数<input id="i-shares" placeholder="100"></label>
+      <label>成本价<input id="i-cost" placeholder="可留空"></label>
+      <label>&nbsp;<button class="btn primary" id="btn-add-pos">加入持仓</button></label>
+      <label>&nbsp;<button class="btn" id="btn-add-watch">加入自选</button></label>
+    </div>
+    <div class="hint" id="add-hint"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">持仓明细 <span class="hint" id="folio-total"></span></div>
+    <div class="tbl-wrap"><table id="folio-tbl"></table></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-h">持仓权重分布</div>
+      <div class="chart" id="c-expo" style="height:260px"></div>
+    </div>
+    <div class="card">
+      <div class="card-h">风险管理检查 <span class="hint">按公开规则机械计算，不构成投资建议</span></div>
+      <div id="risk-box"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">自选股 <span class="hint">新增时会自动补齐该标的的行情/估值/财务</span></div>
+    <div class="tbl-wrap"><table id="watch-tbl"></table></div>
+  </div>
+</section>
+
+<!-- ============ 数据血缘 ============ -->
+<section class="panel" id="panel-lineage">
+  <div class="sec-h">数据血缘<span class="sec-sub">每个数字都能回到它的原始返回</span></div>
+  <div class="card">
+    <div class="card-h">库表行数</div>
+    <div id="lineage-counts"></div>
+  </div>
+  <div class="card">
+    <div class="card-h">原始返回留档 <span class="hint">最近 100 条 API 返回的元信息</span></div>
+    <div class="tbl-wrap"><table id="lineage-tbl"></table></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <b>数据来源与口径</b><br>
+  全部数据经本机同步程序从 <b>NeoData（腾讯金融数据服务）</b> 拉取后落本地 SQLite：
+  行情/指数/板块/资金流为 <b>实时</b> 时效接口，估值序列为 <b>T+1</b>，财务为 <b>H+1</b>（财报披露后）。
+  PE 取「扣非后滚动市盈率」，PB 由最新收盘价 ÷ 最新一期每股净资产推算，
+  股息率为<b>近 12 个月已实施派息合计 ÷ 最新收盘价</b>（TTM 口径）。
+  列表中「—」表示该接口未提供该字段，<b>不是 0，也不是估算值</b>。<br><br>
+  <b>时效性说明</b>：本服务按需/按日同步，<b>不是逐笔实时推送</b>。页面在两次同步之间不会变化，
+  数据时点以顶部标识为准。要更新数据请执行同步程序（或等待每日自动同步）。<br><br>
+  <b>免责声明</b>：以上内容基于公开数据和量化分析，仅供参考，不构成投资建议。市场有风险，投资需谨慎。
+  任何投资决策应结合个人风险承受能力、资金状况和投资目标独立判断，必要时咨询持牌专业机构。过往表现不预示未来收益。
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
