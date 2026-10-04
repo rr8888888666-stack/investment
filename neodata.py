@@ -19,10 +19,37 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-SKILL_ROOT = Path(
-    "/Users/zhangzhijian/.workbuddy/plugins/cache/cb_teams_marketplace/"
-    "finance-data/1.6.0/skills/neodata-financial-search"
-)
+def _default_skill_root() -> Path:
+    """定位 NeoData skill 目录。
+
+    优先级：环境变量 NEODATA_SKILL_ROOT > 在 WorkBuddy 插件缓存里自动发现
+    （通配版本号，避免上游升级后失效）> 常见默认位置。
+    """
+    env = os.environ.get("NEODATA_SKILL_ROOT")
+    if env:
+        return Path(env).expanduser()
+
+    cache = Path.home() / ".workbuddy" / "plugins" / "cache"
+    for pattern in (
+        "cb_teams_marketplace/finance-data/*/skills/neodata-financial-search",
+        "*/finance-data/*/skills/neodata-financial-search",
+        "*/neodata-financial-search",
+    ):
+        hits = sorted(cache.glob(pattern))
+        if hits:
+            return hits[-1]
+
+    return (
+        cache
+        / "cb_teams_marketplace"
+        / "finance-data"
+        / "1.6.0"
+        / "skills"
+        / "neodata-financial-search"
+    )
+
+
+SKILL_ROOT = _default_skill_root()
 QUERY_PY = SKILL_ROOT / "scripts" / "query.py"
 
 PYTHON = os.environ.get("RUISI_PYTHON") or sys.executable

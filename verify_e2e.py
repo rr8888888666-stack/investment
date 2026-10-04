@@ -13,7 +13,7 @@ import urllib.request
 from pathlib import Path
 
 BASE = "http://127.0.0.1:8770"
-DB = Path("/Users/zhangzhijian/WorkBuddy/2026-09-18-15-14-39/ruisi-platform/data/market.db")
+DB = Path(__file__).resolve().parent / "data" / "market.db"
 
 # 本机调试常常带着 HTTP_PROXY 环境变量，那会让 localhost 请求被代理转发而拿到 502。
 # 这里显式绕过代理，直连本机。

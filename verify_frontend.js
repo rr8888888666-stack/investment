@@ -7,7 +7,7 @@ const http = require('http');
 const path = require('path');
 const { JSDOM, VirtualConsole } = require('jsdom');
 
-const ROOT = '/Users/zhangzhijian/WorkBuddy/2026-09-18-15-14-39/ruisi-platform';
+const ROOT = path.resolve(__dirname);
 const PORT = 8770;
 
 let html = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
